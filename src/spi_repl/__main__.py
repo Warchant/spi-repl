@@ -111,6 +111,10 @@ def main() -> None:
             if data.startswith("0x"):
                 data = data[2:]
 
+            # pad with a 0 if the length is odd
+            if len(data) % 2 != 0:
+                data = "0" + data
+
             databytes = bytes.fromhex(data)
             resp = s.transfer(databytes)
             print(f"{device} >>> {resp.hex()}")
