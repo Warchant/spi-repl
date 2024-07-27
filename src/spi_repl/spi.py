@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-__author__ = 'Tom Stokes'
+__author__ = "Tom Stokes"
 
 import ctypes
 import struct
@@ -44,7 +44,7 @@ def _ioc(direction, number, structure):
 
     See Linux kernel source file /include/uapi/asm-generic/ioctl.h
     """
-    ioc_magic = ord('k')
+    ioc_magic = ord("k")
     ioc_nrbits = 8
     ioc_typebits = 8
     ioc_sizebits = 14  # XXX: 13 on PPC, MIPS, Sparc, and Alpha
@@ -55,10 +55,15 @@ def _ioc(direction, number, structure):
 
     size = struct.calcsize(structure)
 
-    op = (direction << ioc_dirshift) | (ioc_magic << ioc_typeshift) | \
-         (number << ioc_nrshift) | (size << ioc_sizeshift)
+    op = (
+        (direction << ioc_dirshift)
+        | (ioc_magic << ioc_typeshift)
+        | (number << ioc_nrshift)
+        | (size << ioc_sizeshift)
+    )
 
     return direction, op, structure
+
 
 def bytes2bytes(value):
     """
@@ -89,6 +94,7 @@ class SPI(object):
         __u8            rx_nbits;
         __u16           pad;
     """
+
     _IOC_TRANSFER_FORMAT = "QQIIHBBBBH"
 
     _IOC_WRITE = 1
@@ -130,9 +136,20 @@ class SPI(object):
     MODE_2 = CPOL
     MODE_3 = CPHA | CPOL
 
-    def __init__(self, device, speed=None, bits_per_word=None, phase=None,
-                 polarity=None, cs_high=None, lsb_first=None,
-                 three_wire=None, loop=None, no_cs=None, ready=None):
+    def __init__(
+        self,
+        device,
+        speed=None,
+        bits_per_word=None,
+        phase=None,
+        polarity=None,
+        cs_high=None,
+        lsb_first=None,
+        three_wire=None,
+        loop=None,
+        no_cs=None,
+        ready=None,
+    ):
         """Create spidev interface object.
 
         Args:
@@ -390,13 +407,22 @@ class SPI(object):
             delay: Optional delay in usecs between sending the last bit and
                 deselecting the chip select line. 0 (default) for no delay.
         """
-        data = array.array('B', data).tobytes()
+        data = array.array("B", data).tobytes()
         length = len(data)
         transmit_buffer = ctypes.create_string_buffer(data)
-        spi_ioc_transfer = struct.pack(SPI._IOC_TRANSFER_FORMAT,
-                                       ctypes.addressof(transmit_buffer), 0,
-                                       length, speed, delay, bits_per_word, 0,
-                                       0, 0, 0)
+        spi_ioc_transfer = struct.pack(
+            SPI._IOC_TRANSFER_FORMAT,
+            ctypes.addressof(transmit_buffer),
+            0,
+            length,
+            speed,
+            delay,
+            bits_per_word,
+            0,
+            0,
+            0,
+            0,
+        )
         fcntl.ioctl(self.handle, SPI._IOC_MESSAGE, spi_ioc_transfer)
 
     def read(self, length, speed=0, bits_per_word=0, delay=0):
@@ -415,10 +441,19 @@ class SPI(object):
             List of words read from device
         """
         receive_buffer = ctypes.create_string_buffer(length)
-        spi_ioc_transfer = struct.pack(SPI._IOC_TRANSFER_FORMAT, 0,
-                                       ctypes.addressof(receive_buffer),
-                                       length, speed, delay, bits_per_word, 0,
-                                       0, 0, 0)
+        spi_ioc_transfer = struct.pack(
+            SPI._IOC_TRANSFER_FORMAT,
+            0,
+            ctypes.addressof(receive_buffer),
+            length,
+            speed,
+            delay,
+            bits_per_word,
+            0,
+            0,
+            0,
+            0,
+        )
         fcntl.ioctl(self.handle, SPI._IOC_MESSAGE, spi_ioc_transfer)
         return bytes2bytes(ctypes.string_at(receive_buffer, length))
 
@@ -437,14 +472,22 @@ class SPI(object):
         Returns:
             List of words read from SPI bus during transfer
         """
-        data = array.array('B', data).tobytes()
+        data = array.array("B", data).tobytes()
         length = len(data)
         transmit_buffer = ctypes.create_string_buffer(data)
         receive_buffer = ctypes.create_string_buffer(length)
-        spi_ioc_transfer = struct.pack(SPI._IOC_TRANSFER_FORMAT,
-                                       ctypes.addressof(transmit_buffer),
-                                       ctypes.addressof(receive_buffer),
-                                       length, speed, delay, bits_per_word, 0,
-                                       0, 0, 0)
+        spi_ioc_transfer = struct.pack(
+            SPI._IOC_TRANSFER_FORMAT,
+            ctypes.addressof(transmit_buffer),
+            ctypes.addressof(receive_buffer),
+            length,
+            speed,
+            delay,
+            bits_per_word,
+            0,
+            0,
+            0,
+            0,
+        )
         fcntl.ioctl(self.handle, SPI._IOC_MESSAGE, spi_ioc_transfer)
         return bytes2bytes(ctypes.string_at(receive_buffer, length))
