@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "spi-repl"
+version = "0.1.0"
+description = ""
+authors = ["Bohdan Vanieiev <warchantua@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+[tool.poetry.scripts]
+spi-repl = "spi_repl.__main__:main"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
