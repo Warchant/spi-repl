@@ -78,6 +78,10 @@ def main() -> None:
         default=False,
         help="SPI slave pulls low to pause. Default: %(default)s",
     )
+
+    g = parser.add_argument_group("Transfer options")
+    g.add_argument("--delay", type=int, default=0, help="SPI delay in usecs. Default: %(default)s")
+
     args = parser.parse_args()
 
     try:
@@ -116,7 +120,7 @@ def main() -> None:
                 data = "0" + data
 
             databytes = bytes.fromhex(data)
-            resp = s.transfer(databytes)
+            resp = s.transfer(databytes, delay=args.delay)
             print(f"{device} >>> {resp.hex()}")
             continue
         except ValueError:
